@@ -63,7 +63,11 @@ app.post('/summaries', async(req, res) => {
     const { actualUrl } = req.body
     const model = genAI.getGenerativeModel({ model: "gemini-pro"})
 
-    const prompt = `Summarize this blog: ${actualUrl}`
+    const prompt = `Summarize this blog ${actualUrl} in a concise and informative
+                    way. In your summary start with the blog's title as a heading.
+                    At the end of your summary always include a key takeaways section
+                    for the blog. Also below this add a daily joke section and display 
+                    it with italics formatting.`
 
     const result = await model.generateContent(prompt)
     const response = await result.response
