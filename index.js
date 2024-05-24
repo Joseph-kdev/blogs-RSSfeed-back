@@ -44,8 +44,7 @@ const parseFeed = async feedInfo => {
         const feed = await parser.parseURL(value);
         feedsData[key] = feed.items
     } catch (error) {
-        console.error(`Error parsing feed ${key}:`, error);
-        feedsData[key] = [];
+        console.error('Error parsing feed', error);
     }
 }
 
