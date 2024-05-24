@@ -61,7 +61,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.post('/api/summaries', async(req, res) => {
+app.post('/summaries', async(req, res) => {
     const { actualUrl } = req.body
     const model = genAI.getGenerativeModel({ model: "gemini-pro"})
 
