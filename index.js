@@ -2,6 +2,7 @@ const cors = require("cors")
 const RSSparser = require("rss-parser")
 const express = require("express")
 
+const app = express();
 
 const genAI = require("./gemini-start")
 const config = require("./utils/config")
@@ -33,35 +34,46 @@ const feedURLs = [
     },
 ]
 
+
 const parser = new RSSparser();
 const feedsData = {}
 
 const parseFeed = async feedInfo => {
-    const {key, value} = feedInfo
-    const feed = await parser.parseURL(value);
-    feedsData[key] = feed.items
+    try {        
+        const {key, value} = feedInfo
+        const feed = await parser.parseURL(value);
+        feedsData[key] = feed.items
+    } catch (error) {
+        console.error(`Error parsing feed ${key}:`, error);
+        feedsData[key] = [];
+    }
 }
 
 const parseFeeds = async() => {
-    for(const feedInfo of feedURLs) {
-        await parseFeed(feedInfo)
-    }
+    const parsePromises = feedURLs.map(parseFeed);
+    await Promise.all(parsePromises);
 }
 
 parseFeeds()
 
-const app = express();
-
+app.use(express.static("dist"))
 app.use(cors())
-
 app.use(express.json())
 
-app.get('/', (req, res) => {
-    res.send(feedsData)
+app.get('/api/blogs', async(req, res) => {
+    try {
+        if (Object.keys(feedsData).length === 0) {
+            await parseFeeds();
+        }
+        res.send(feedsData);
+    } catch (error) {
+        console.error('Error fetching feeds:', error);
+        res.status(500).send('Error fetching feeds.');
+    }
 })
 
 
-app.post('/summaries', async(req, res) => {
+app.post('/api/summaries', async(req, res) => {
     const { actualUrl } = req.body
     const model = genAI.getGenerativeModel({ model: "gemini-pro"})
 
@@ -76,20 +88,7 @@ app.post('/summaries', async(req, res) => {
     res.send(text)
 })
 
-async function run() {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"})
-
-    const prompt = "Summarize this blog: https://blog.bytebytego.com/p/cloudflares-trillion-message-kafka"
-
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
-    console.log(text);
-}
-
-// run()
-
 
 const server = app.listen(config.PORT, () => {
-    console.log('server running');
+    console.log(`server running on port ${config.PORT}`);
 })
