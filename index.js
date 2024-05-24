@@ -51,7 +51,11 @@ const parseFeeds = async() => {
 parseFeeds()
 
 const app = express();
-app.use(cors())
+
+app.use(cors({
+    origin: "https://blogs-rs-sfeed-back.vercel.app"
+}))
+
 app.use(express.json())
 
 app.get('/', (req, res) => {
@@ -66,8 +70,7 @@ app.post('/summaries', async(req, res) => {
     const prompt = `Summarize this blog ${actualUrl} in a concise and informative
                     way. In your summary start with the blog's title as a heading.
                     At the end of your summary always include a key takeaways section
-                    for the blog. Also below this add a daily joke section and display 
-                    it with italics formatting.`
+                    for the blog.`
 
     const result = await model.generateContent(prompt)
     const response = await result.response
