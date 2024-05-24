@@ -52,9 +52,7 @@ parseFeeds()
 
 const app = express();
 
-app.use(cors({
-    origin: "https://blogs-rs-sfeed-back.vercel.app"
-}))
+app.use(cors())
 
 app.use(express.json())
 
