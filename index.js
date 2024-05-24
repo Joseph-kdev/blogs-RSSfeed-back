@@ -56,12 +56,12 @@ app.use(cors())
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
+app.get('/api/blogs', (req, res) => {
     res.send(feedsData)
 })
 
 
-app.post('/summaries', async(req, res) => {
+app.post('/api/summaries', async(req, res) => {
     const { actualUrl } = req.body
     const model = genAI.getGenerativeModel({ model: "gemini-pro"})
 
