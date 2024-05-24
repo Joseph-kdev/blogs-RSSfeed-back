@@ -56,7 +56,7 @@ app.use(cors())
 
 app.use(express.json())
 
-app.get('/api/blogs', (req, res) => {
+app.get('/', (req, res) => {
     res.send(feedsData)
 })
 
