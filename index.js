@@ -11,41 +11,44 @@ const feedURLs = [
         key: "bytebytego",
         value:"https://blog.bytebytego.com/feed",
     },
-    {
-        key: "cssTricks",
-        value:"https://css-tricks.com/feed",
-    },
-    {
-        key: "liveSec",
-        value:"https://www.welivesecurity.com/feed"
-    },
-    {
-        key: "logRocket",
-        value:"https://blog.logrocket.com/feed",
-    },
-    {
-        key: "smashingMag",
-        value:"https://www.smashingmagazine.com/feed"
-    },
-    {
-        key: "codingHorror",
-        value:"https://blog.codinghorror.com/rss"
-    },
+    // {
+    //     key: "cssTricks",
+    //     value:"https://css-tricks.com/feed",
+    // },
+    // {
+    //     key: "liveSec",
+    //     value:"https://www.welivesecurity.com/feed"
+    // },
+    // {
+    //     key: "logRocket",
+    //     value:"https://blog.logrocket.com/feed",
+    // },
+    // {
+    //     key: "smashingMag",
+    //     value:"https://www.smashingmagazine.com/feed"
+    // },
+    // {
+    //     key: "codingHorror",
+    //     value:"https://blog.codinghorror.com/rss"
+    // },
 ]
 
 const parser = new RSSparser();
 const feedsData = {}
 
 const parseFeed = async feedInfo => {
-    const {key, value} = feedInfo
-    const feed = await parser.parseURL(value);
-    feedsData[key] = feed.items
+    try {
+        const {key, value} = feedInfo
+        const feed = await parser.parseURL(value);
+        feedsData[key] = feed.items
+    } catch (error) {
+        console.error('Error parsing feed', error);
+    }
 }
 
 const parseFeeds = async() => {
-    for(const feedInfo of feedURLs) {
-        await parseFeed(feedInfo)
-    }
+    const parsePromises = feedURLs.map(parseFeed);
+    await Promise.all(parsePromises);
 }
 
 parseFeeds()
@@ -56,8 +59,16 @@ app.use(cors())
 
 app.use(express.json())
 
-app.get('/', (req, res) => {
-    res.send(feedsData)
+app.get('/', async(req, res) => {
+    try {
+        if (Object.keys(feedsData).length === 0) {
+            await parseFeeds();
+        }
+        res.send(feedsData);
+    } catch (error) {
+        console.error('Error fetching feeds:', error);
+        res.status(500).send('Error fetching feeds.');
+    }
 })
 
 
