@@ -56,12 +56,12 @@ const parseFeeds = async() => {
 
 parseFeeds()
 
-app.use(express.static("dist"))
+app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json())
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(process.cwd(), "dist", "index.html"));
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 app.get('/api/blogs', async(req, res) => {

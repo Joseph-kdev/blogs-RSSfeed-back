@@ -6,7 +6,9 @@
   "type": "commonjs",
   "scripts": {
     "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:ui": "rm -rf dist && cd ../rss-feed-front && npm run build && cp -r dist ../rss-feed-back",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "author": "\"joseph\"",
   "license": "ISC",
