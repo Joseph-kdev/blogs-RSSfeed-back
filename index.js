@@ -39,7 +39,7 @@ const parser = new RSSparser();
 const feedsData = {}
 
 const parseFeed = async feedInfo => {
-    try {        
+    try {
         const {key, value} = feedInfo
         const feed = await parser.parseURL(value);
         feedsData[key] = feed.items
@@ -58,6 +58,10 @@ parseFeeds()
 app.use(express.static("dist"))
 app.use(cors())
 app.use(express.json())
+
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 app.get('/api/blogs', async(req, res) => {
     try {
