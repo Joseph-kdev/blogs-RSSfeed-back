@@ -1,36 +1,27 @@
 const cors = require("cors")
 const RSSparser = require("rss-parser")
 const express = require("express")
-
-
 const genAI = require("./gemini-start")
 const config = require("./utils/config")
+
+const app = express();
+
+app.use(cors())
+app.use(express.json())
 
 const feedURLs = [
     {   
         key: "bytebytego",
         value:"https://blog.bytebytego.com/feed",
     },
-    // {
-    //     key: "cssTricks",
-    //     value:"https://css-tricks.com/feed",
-    // },
-    // {
-    //     key: "liveSec",
-    //     value:"https://www.welivesecurity.com/feed"
-    // },
-    // {
-    //     key: "logRocket",
-    //     value:"https://blog.logrocket.com/feed",
-    // },
-    // {
-    //     key: "smashingMag",
-    //     value:"https://www.smashingmagazine.com/feed"
-    // },
-    // {
-    //     key: "codingHorror",
-    //     value:"https://blog.codinghorror.com/rss"
-    // },
+    {
+        key: "logRocket",
+        value:"https://blog.logrocket.com/feed",
+    },
+    {
+        key: "codingHorror",
+        value:"https://blog.codinghorror.com/rss"
+    },
 ]
 
 const parser = new RSSparser();
@@ -45,19 +36,10 @@ const parseFeed = async feedInfo => {
         console.error('Error parsing feed', error);
     }
 }
-
 const parseFeeds = async() => {
     const parsePromises = feedURLs.map(parseFeed);
     await Promise.all(parsePromises);
 }
-
-parseFeeds()
-
-const app = express();
-
-app.use(cors())
-
-app.use(express.json())
 
 app.get('/', async(req, res) => {
     try {
@@ -87,20 +69,12 @@ app.post('/summaries', async(req, res) => {
     res.send(text)
 })
 
-async function run() {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"})
+app.post('login', async(req, res) => {
+    const { email, password } = req.body
 
-    const prompt = "Summarize this blog: https://blog.bytebytego.com/p/cloudflares-trillion-message-kafka"
-
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const text = response.text()
-    console.log(text);
-}
-
-// run()
-
+    
+})
 
 const server = app.listen(config.PORT, () => {
-    console.log('server running');
+    console.log(`server running at ${config.PORT}`);
 })
