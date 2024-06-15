@@ -69,11 +69,6 @@ app.post('/summaries', async(req, res) => {
     res.send(text)
 })
 
-app.post('login', async(req, res) => {
-    const { email, password } = req.body
-
-    
-})
 
 const server = app.listen(config.PORT, () => {
     console.log(`server running at ${config.PORT}`);
